@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm
+from app.forms import LoginForm, RegistrationForm, DecisionForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
@@ -10,35 +10,31 @@ import random
 @app.route('/index')
 @login_required
 def index():
-    """
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    """
-    
-    return render_template('index.html', title='Home')#, user=user, posts=posts)
+    form = DecisionForm()
+    return render_template('index.html', title='Home', form=form)#, user=user, posts=posts)
 
 @app.route('/decide', methods=['POST'])
 @login_required
 def decide():
     #options = request.form['options'].split(',')
-    #selection = random.choice(options)
-    #return render_template('decide_result.html', selection=selection)
+    options = list(filter(bool, request.form['options'].splitlines()))
+    selection = random.choice(options)
+    return render_template('decide_result.html', selection=selection)
+    
+    """""
     options = []
     for key, value in request.form.items():
         if key.startswith('option-'):
             options.append(value)
     selection = random.choice(options)
     return render_template('decide_result.html', selection=selection)
-
+    """
+@app.route('/profile')
+@login_required
+def profile():
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+    return render_template('profile.html', user=user)
+    
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
