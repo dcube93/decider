@@ -28,5 +28,10 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
         
 class DecisionForm(FlaskForm):
-    options = TextAreaField('Options')
+    name = StringField('TemplateName')
+    options = TextAreaField('Options', validators=[DataRequired()])
     submit = SubmitField('Decide')
+    
+class ResultForm(FlaskForm):
+    name = StringField('TemplateName')
+    submit = SubmitField('Continue')

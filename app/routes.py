@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, DecisionForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Template, Choice
 from werkzeug.urls import url_parse
 import random
 
@@ -11,29 +11,80 @@ import random
 @login_required
 def index():
     form = DecisionForm()
-    return render_template('index.html', title='Home', form=form)#, user=user, posts=posts)
+    return render_template('index.html', title='Home', form=form)
 
-@app.route('/decide', methods=['POST'])
+@app.route('/decide/<templateID>', methods=['POST','GET'])
+@login_required
+def decide_template(templateID):
+    #templateID = request.args.get("id")
+    if templateID is not None:
+        template = Template.query.get(templateID)
+        if template is not None:
+            if template.user_id == current_user.id:
+                temp_options = template.choices.all()
+                options = []
+                for temp_option in temp_options:
+                    options.append(temp_option.value)
+                selection = random.choice(options)
+            else:
+                #back to index
+                return redirect(url_for('index'))
+        else:
+                #back to index
+                return redirect(url_for('index'))
+    else:
+        #options = list(filter(bool, request.form['options'].splitlines()))
+        #flash(options)
+        return redirect(url_for('index'))
+
+    
+    
+    return render_template('decide_result.html', selection=selection, options=options)
+
+@app.route('/decide', methods=['POST','GET'])
 @login_required
 def decide():
-    #options = request.form['options'].split(',')
+    """"
+    templateID = request.args.get("id")
+    if templateID is not None:
+        template = Template.query.get(templateID)
+        if template.user_id == current_user.id:
+            temp_options = template.choices.all()
+            options = []
+            for temp_option in temp_options:
+                options.append(temp_option.value)
+            flash(options)
+        else:
+            #back to index
+            return redirect(url_for('index'))
+    else:
+        options = list(filter(bool, request.form['options'].splitlines()))
+        flash(options)
+    """
     options = list(filter(bool, request.form['options'].splitlines()))
     selection = random.choice(options)
-    return render_template('decide_result.html', selection=selection)
+    flash(selection)
+    name = request.form['name']
     
-    """""
-    options = []
-    for key, value in request.form.items():
-        if key.startswith('option-'):
-            options.append(value)
-    selection = random.choice(options)
-    return render_template('decide_result.html', selection=selection)
-    """
+    if name is not None:
+        t = Template(name=name, owning_u=current_user)
+        db.session.add(t)
+        
+        for option in options:
+            c = Choice(value=option, owning_t=t)
+            db.session.add(c)
+        
+        db.session.commit()
+        flash('Template saved to profile.')
+    
+    return render_template('decide_result.html', selection=selection, options=options, name=name)
+
 @app.route('/profile')
 @login_required
 def profile():
     user = User.query.filter_by(username=current_user.username).first_or_404()
-    return render_template('profile.html', user=user)
+    templates = user.templates.all()
+    return render_template('profile.html', user=user, templates=templates)
     
 @app.route('/login', methods=['GET', 'POST'])
 def login():
