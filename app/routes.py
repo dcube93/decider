@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, DecisionForm
 from flask_login import current_user, login_user, logout_user, login_required
@@ -149,3 +149,38 @@ def register():
         return redirect(url_for('login'))
     # Übergabe and die HTML WebSeite.
     return render_template('register.html', title='Register', form=form)
+
+# API um eigene Vorlagen auszulease
+# Eigenentwicklung
+@app.route('/API/<Username>', methods=['GET'])
+@login_required
+def API(Username):
+    # Abfrage ob Benutzername übermittelt wurde.
+    if Username is not None:
+        # Benutzer von DB in Variable speichern.
+        U = User.query.filter_by(username=Username).first()
+        # Abfrage ob Benutzer von DB in Variable gespeichert wurde. 
+        if U is not None:
+            # Abfrage ob der Benutzer dem angemeldeten Benutzer entspricht.
+            if U.id == current_user.id:
+                # Hohlt alle Vorlagen und Auswahlmöglichkeiten DB und fügt deren Werte zur Variable mylist hinzu.
+                mylist = list()
+                temp_templates = U.templates.all()
+                for temp_template in temp_templates:
+                    temp_options = temp_template.choices.all()
+                    temp_option_list = list()
+                    for temp_option in temp_options:
+                        temp_option_list.append(temp_option.value)
+                    mylist.append( [{'Vorlage:': temp_template.name, 'Auswahlmoeglichkeiten:': temp_option_list}] )
+            # Falls die Benutzername nicht dem angemeldeten Benutzer gehört, zurück zur Startseite.
+            else:
+                return redirect(url_for('index'))
+        # Falls kein Benutzer aus der DB in die Variable gespeichert wurde, zurück zur Startseite.
+        else:
+            return redirect(url_for('index'))
+    # Falls keine Benutzername übermittelt wurde, zurück zur Startseite.
+    else:
+        return redirect(url_for('index'))
+
+    # Übergabe an jsonify.
+    return jsonify(str(mylist))
