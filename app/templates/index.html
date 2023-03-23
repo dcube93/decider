@@ -1,19 +1,22 @@
+<!-- Startseite Vorlage. Benutzer können Auswahlmöglichkeiten und Vorlage Namen angeben. -->
+<!-- Eigenentwicklung -->
+
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}!</h1>
-    <h2>Lets make some decisions for you</h2>
+    <h1>Hallo, {{ current_user.username }}</h1>
+    <h2>Lass uns eine Entscheidung treffen.</h2>
     <form method="POST" action="{{ url_for('decide') }}">
         {{ form.hidden_tag() }}
         <p>
-            Please provide your options each on its own line: <br>
+            Bitte geben Sie ihre Auswahlmöglichkeiten ein. Jede auf eine neue Zeile: <br>
             {{ form.options(cols="45", rows="5") }}
             {% for error in form.options.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            To save the decision as a template, give it a name. <br><br>
+            Um die Auswahlmöglichkeiten als Vorlage zu speichen, geben Sie einen Namen ein. <br>
             {{ form.name(size=32) }}<br>
             {% for error in form.name.errors %}
             <span style="color: red;">[{{ error }}]</span>

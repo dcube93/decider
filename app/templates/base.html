@@ -1,20 +1,23 @@
+<!-- Basis Vorlage. Hier wird die Basis geschaffen. Menüpunkte werden hier definiert. -->
+<!-- Quelle: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms & Eigenentwicklung -->
+
 <html>
     <head>
         {% if title %}
-        <title>{{ title }} - Decider</title>
+        <title>{{ title }} - Entscheider</title>
         {% else %}
-        <title>Decider</title>
+        <title>Entscheider</title>
         {% endif %}
     </head>
     <body>
         <div>
-            Decider:
-            <a href="{{ url_for('index') }}">Home</a>
+            Entscheider:
+            <a href="{{ url_for('index') }}">Startseite</a>
             {% if current_user.is_anonymous %}
-            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('login') }}">Anmeldung</a>
             {% else %}
-            <a href="{{ url_for('profile') }}">Profile</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
+            <a href="{{ url_for('profile') }}">Profil</a>
+            <a href="{{ url_for('logout') }}">Abmeldung</a>
             {% endif %}
         </div>
         <hr>
@@ -28,6 +31,6 @@
         {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
-        {% block scripts%}{% endblock %}
+        <!--{% block scripts%}{% endblock %}-->
     </body>
 </html>
