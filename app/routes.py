@@ -150,7 +150,7 @@ def register():
     # Übergabe and die HTML WebSeite.
     return render_template('register.html', title='Register', form=form)
 
-# API um eigene Vorlagen auszulease
+# API um eigene Vorlagen auszulesen
 # Eigenentwicklung
 @app.route('/API/<Username>', methods=['GET'])
 @login_required
