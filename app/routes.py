@@ -63,10 +63,9 @@ def decide():
     """
     options = list(filter(bool, request.form['options'].splitlines()))
     selection = random.choice(options)
-    flash(selection)
     name = request.form['name']
     
-    if name is not None:
+    if name != '':
         t = Template(name=name, owning_u=current_user)
         db.session.add(t)
         
