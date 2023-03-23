@@ -8,12 +8,12 @@
         <tr valign="top">
             <td><img src="{{ user.avatar('128') }}"></td>
             <td>
-                <h2>User: {{ user.username }}</h2>
-                <h2>Mail: {{ user.email }}</h2>
+                <h2>Benutzername: {{ user.username }}</h2>
+                <h2>E-Mail: {{ user.email }}</h2>
             </td>
         </tr>
         <tr valign="top">
-            <td><h2>Templates: </h2></td>
+            <td><h2>Vorlagen: </h2></td>
             <td>
                 {% for template in templates %} 
                 <a href="{{ url_for('decide_template', templateID=template.id) }}">{{ template.name }}</a><br>
